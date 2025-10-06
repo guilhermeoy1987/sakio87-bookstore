@@ -4,9 +4,10 @@
 # -*- coding: utf-8 -*-
 
 
+# product/models/product.py
 from django.db import models
+from .category import Category   # <-- direto do arquivo, não do __init__
 
-from product.models import Category
 
 
 class Product(models.Model):
@@ -14,7 +15,7 @@ class Product(models.Model):
     description = models.TextField(max_length=500, blank=True, null=True)
     price = models.PositiveIntegerField(null=True)
     active = models.BooleanField(default=True)
-    category = models.ManyToManyField(Category, blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
 
 
     def __str__(self):
