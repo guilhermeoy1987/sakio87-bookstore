@@ -1,5 +1,8 @@
 import factory
 from django.contrib.auth.models import User
+from product.models.category import Category
+from product.models.product import Product
+from order.models.order import Order
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -17,8 +20,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     active = factory.Iterator([True, False])
 
     class Meta:
-        from product.models.category import Category
-        model = Category
+        model = Category   # ✅ apenas isso dentro da Meta
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
@@ -36,8 +38,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
                 self.categories.add(category)
 
     class Meta:
-        from product.models.product import Product
-        model = Product
+        model = Product   # ✅ import feito no topo
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
@@ -53,5 +54,5 @@ class OrderFactory(factory.django.DjangoModelFactory):
                 self.products.add(product)
 
     class Meta:
-        from order.models.order import Order
-        model = Order
+        model = Order   # ✅ import feito no topo
+

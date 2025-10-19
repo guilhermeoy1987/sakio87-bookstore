@@ -19,17 +19,9 @@ Including another URLconf
 # bookstore/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-# ✅ importações corretas
-from product.viewsets.category_viewset import CategoryViewSet
-from product.viewsets.product_viewset import ProductViewSet
-
-router = DefaultRouter()
-router.register(r'categories', CategoryViewSet, basename='category')
-router.register(r'products', ProductViewSet, basename='product')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/<str:version>/', include(router.urls)),
+    path('api/v1/products/', include('product.urls')),
+    path('api/v1/orders/', include('order.urls')),
 ]
