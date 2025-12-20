@@ -1,11 +1,13 @@
-from rest_framework.viewsets import ModelViewSet
-
+from rest_framework import viewsets
 from product.models import Category
-from product.serializers.category_serializer import CategorySerializer
+from product.serializers import CategorySerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-
-class CategoryViewSet(ModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para Category.
+    Suporta: list, retrieve, create, update, destroy
+    """
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-    def get_queryset(self):
-        return Category.objects.all().order_by("id")
+    permission_classes = [] 

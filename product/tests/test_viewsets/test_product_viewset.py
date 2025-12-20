@@ -1,13 +1,11 @@
-import json
-
-from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient, APITestCase
-from rest_framework.views import status
-
 from order.factories import UserFactory
 from product.factories import CategoryFactory, ProductFactory
 from product.models import Product
+from rest_framework.test import APITestCase, APIClient
+from rest_framework.authtoken.models import Token
+from django.urls import reverse
+from rest_framework import status
+import json
 
 
 class TestProductViewSet(APITestCase):
@@ -26,7 +24,9 @@ class TestProductViewSet(APITestCase):
     def test_get_all_product(self):
         token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-        response = self.client.get(reverse("product-list"))
+        
+        # Aqui o reverse com o parâmetro version
+        response = self.client.get(reverse("product-list", kwargs={"version": "v1"}))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         product_data = json.loads(response.content)
@@ -38,6 +38,7 @@ class TestProductViewSet(APITestCase):
     def test_create_product(self):
         token = Token.objects.get(user__username=self.user.username)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+        
         category = CategoryFactory()
         data = json.dumps({
             "title": "notebook",
@@ -45,8 +46,9 @@ class TestProductViewSet(APITestCase):
             "categories_id": [category.id]
         })
 
+        # Aqui também, reverse com o parâmetro version
         response = self.client.post(
-            reverse("product-list"),
+            reverse("product-list", kwargs={"version": "v1"}),
             data=data,
             content_type="application/json",
         )
@@ -56,3 +58,4 @@ class TestProductViewSet(APITestCase):
         created_product = Product.objects.get(title="notebook")
         self.assertEqual(created_product.title, "notebook")
         self.assertEqual(created_product.price, 800.00)
+
