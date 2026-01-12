@@ -17,14 +17,27 @@ Including another URLconf
 
 # bookstore/urls.py
 # bookstore/urls.py
-import debug_toolbar # type: ignore
 from django.contrib import admin
 from django.urls import path, re_path, include
 
+from rest_framework.authtoken.views import obtain_auth_token
+
 urlpatterns = [
-    path('__debug__/', include(debug_toolbar.urls)),
+    path('__debug__/', include('debug_toolbar.urls')),
     path('admin/', admin.site.urls),
-    # Remova o $ e o que vem depois do include
-    re_path(r'^bookstore/(?P<version>(v1|v2))/orders/', include('order.urls')),
-    re_path(r'^bookstore/(?P<version>(v1|v2))/products/', include('product.urls')),
+
+    re_path(
+        r'^bookstore/(?P<version>(v1|v2))/',
+        include('order.urls')
+    ),
+    re_path(
+        r'^bookstore/(?P<version>(v1|v2))/',
+        include('product.urls')
+    ),
+
+    path(
+        'api-token-auth/',
+        obtain_auth_token,
+        name='api_token_auth'
+    ),
 ]

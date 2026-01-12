@@ -1,14 +1,14 @@
-
-from rest_framework import status
-from rest_framework.mixins import CreateModelMixin
-from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from order.models import Order
 from order.serializers.order_serializer import OrderSerializer
 
 
 class OrderViewSet(ModelViewSet):
-    
     serializer_class = OrderSerializer
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by("id")
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
