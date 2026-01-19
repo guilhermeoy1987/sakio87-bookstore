@@ -19,9 +19,15 @@ class ProductSerializer(serializers.ModelSerializer):
             'description',
             'price',
             'active',
-            'categories',      # saída
-            'categories_id',   # entrada
+            'categories',
+            'categories_id',
         ]
+        read_only_fields = ("active",)
+
+    def validate_price(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Preço não pode ser negativo.")
+        return value
 
     def create(self, validated_data):
         categories = validated_data.pop("categories_id", [])
@@ -31,11 +37,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         categories = validated_data.pop("categories_id", None)
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
         instance.save()
+
         if categories is not None:
             instance.categories.set(categories)
+
         return instance
+
 
 

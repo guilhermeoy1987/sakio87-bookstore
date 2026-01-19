@@ -9,8 +9,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
 
-    username = factory.Faker("user_name")
-    email = factory.Faker("email")
+    username = factory.Sequence(lambda n: f"user{n}")
+    email = factory.LazyAttribute(lambda obj: f"{obj.username}@test.com")
+    password = factory.PostGenerationMethodCall("set_password", "123456")
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
@@ -43,3 +44,4 @@ class ProductFactory(factory.django.DjangoModelFactory):
         if extracted:
             for category in extracted:
                 self.categories.add(category)
+

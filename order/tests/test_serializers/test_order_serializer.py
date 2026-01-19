@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
-from order.factories import OrderFactory, ProductFactory
-from order.serializers import OrderSerializer
+from order.factories import OrderFactory
+from product.factories import ProductFactory
+from order.serializers.order_serializer import OrderSerializer
 
 
 class TestOrderSerializer(TestCase):

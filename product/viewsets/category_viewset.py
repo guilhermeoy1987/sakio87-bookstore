@@ -1,13 +1,24 @@
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import AllowAny, IsAdminUser
+
 from product.models import Category
 from product.serializers import CategorySerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-class CategoryViewSet(viewsets.ModelViewSet):
+
+class CategoryViewSet(ModelViewSet):
     """
     ViewSet para Category.
-    Suporta: list, retrieve, create, update, destroy
+    GET → público
+    POST / PUT / PATCH / DELETE → apenas admin
     """
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [] 
+    queryset = Category.objects.all()
+
+    def get_permissions(self):
+        # Rotas públicas (catálogo)
+        if self.request.method in ["GET", "HEAD", "OPTIONS"]:
+            return [AllowAny()]
+
+        # Escrita apenas para admin
+        return [IsAdminUser()]
+
