@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -81,11 +81,14 @@ WSGI_APPLICATION = "bookstore.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -139,7 +142,18 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Adicione isso ao final do arquivo settings.py
+# Configuração para o Django Debug Toolbar aparecer localmente
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# Pega a Chave Secreta do ambiente. Se não existir, o Django dará erro (mais seguro)
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+# Pega o modo DEBUG do ambiente. O padrão é 0 (False) por segurança
+DEBUG = int(os.environ.get("DEBUG", default=0))
+
+# Explicação: 'DJANGO_ALLOWED_HOSTS' deve ser uma string com nomes separados por espaço.
+# Exemplo: 'localhost 127.0.0.1 [::1]'
+# O .split(" ") transforma essa string em uma lista de Python, que é o que o Django exige.
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
