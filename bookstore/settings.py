@@ -147,13 +147,20 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-# Pega a Chave Secreta do ambiente. Se não existir, o Django dará erro (mais seguro)
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# --- SOBREPOSIÇÃO POR VARIÁVEIS DE AMBIENTE ---
+
+# Pega a Chave Secreta do ambiente. Se não existir, usa a padrão de dev.
+SECRET_KEY = os.environ.get("SECRET_KEY", SECRET_KEY)
 
 # Pega o modo DEBUG do ambiente. O padrão é 0 (False) por segurança
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-# Explicação: 'DJANGO_ALLOWED_HOSTS' deve ser uma string com nomes separados por espaço.
-# Exemplo: 'localhost 127.0.0.1 [::1]'
-# O .split(" ") transforma essa string em uma lista de Python, que é o que o Django exige.
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+# Se a variável DJANGO_ALLOWED_HOSTS existir, usamos ela. 
+# Caso contrário, liberamos localhost e rede local para evitar o erro 500.
+env_allowed_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS")
+
+if env_allowed_hosts:
+    ALLOWED_HOSTS = env_allowed_hosts.split(" ")
+else:
+    # Fallback para permitir acesso local e Docker
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "[::1]"]
