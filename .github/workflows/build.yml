@@ -1,0 +1,45 @@
+name: Python application
+
+# Define que o workflow rodará em todo push ou pull request para a branch principal
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Atualizado para incluir a versão 3.13 que estamos usando no Docker
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Instala a versão correta do Python definida na matriz
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 3. Instala o Poetry (gerenciador de dependências)
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # 4. Instala as dependências do projeto (Django, DRF, Psycopg 3, etc)
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      # 5. Executa os testes automatizados da sua livraria
+      - name: Run Tests
+        run: |
+          # O comando utiliza o poetry para garantir o ambiente virtual correto
+          poetry run python manage.py test

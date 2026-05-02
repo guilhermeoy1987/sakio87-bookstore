@@ -1,38 +1,26 @@
-
 services:
   db:
-    image: postgres:15
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: bookstore_db
+    image: postgres:15.0-alpine
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend
-
-  app:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=bookstore_dev
+      - POSTGRES_PASSWORD=bookstore_dev
+      - POSTGRES_DB=bookstore_dev_db
+  web:
     build: .
-    container_name: bookstore_app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app/
+      - app_data:/usr/src/app/
     ports:
-      - "8000:8000"
+      - 8000:8000
+    env_file: env.dev
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=bookstore_db
-      - DB_USER=user
-      - DB_PASSWORD=password
-    networks:
-      - backend
-networks:
-  backend:
-    driver: bridge
 
 volumes:
   postgres_data:
+  app_data:
