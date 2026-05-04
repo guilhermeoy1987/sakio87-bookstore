@@ -1,12 +1,8 @@
-name: Python Pull Request Workflow
+name: Python Action Demo
 
 on:
-  pull_request:
-    branches: [main, master]
-
-env:
-  # Resolve o aviso de depreciação do Node.js 20 visto no log
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  push:
+    branches: [actiondemo] # Agora focado na sua branch de demonstração
 
 jobs:
   qa:
@@ -44,25 +40,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Usa o requirements.txt limpo para evitar conflitos de build
           poetry install --no-interaction --no-root
 
       - name: Run Tests
         env:
-          # Variáveis para o Django encontrar o banco temporário acima
+          # Estas chaves devem ser iguais ao seu settings.py
           SQL_ENGINE: django.db.backends.postgresql
-          DB_NAME: bookstore_db
-          DB_USER: bookstore_user
-          DB_PASSWORD: bookstore_password
-          DB_HOST: localhost
-          DB_PORT: 5432
+          SQL_DATABASE: bookstore_db
+          SQL_USER: bookstore_user
+          SQL_PASSWORD: bookstore_password
+          SQL_HOST: localhost
+          SQL_PORT: 5432
         run: |
           poetry run python manage.py test
-
-      - name: Wemake Python Styleguide
-        uses: wemake-services/wemake-python-styleguide@0.19.2
-        continue-on-error: true
-        with:
-          reporter: "github-pr-review"
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
