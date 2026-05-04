@@ -2,7 +2,7 @@ name: Python Action Demo
 
 on:
   push:
-    branches: [actiondemo] # Agora focado na sua branch de demonstração
+    branches: [actiondemo, actiondemo2] # Adicionei actiondemo2 aqui
 
 jobs:
   qa:
