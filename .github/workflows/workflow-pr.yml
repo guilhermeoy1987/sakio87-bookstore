@@ -1,0 +1,48 @@
+name: Python Pull Request Workflow
+
+# Este workflow só roda quando um Pull Request é aberto ou atualizado
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  qa:
+    name: Quality check
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do Pull Request
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configura o Python (usando a versão 3.13 do seu projeto)
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 3. Instala o Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # 4. Instala as dependências
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      # 5. Executa os testes automatizados
+      - name: Run Tests
+        run: |
+          poetry run python manage.py test
+
+      # 6. Verificação de Estilo (Lint/Styleguide)
+      # Isso garante que seu código está "limpo" e segue os padrões profissionais
+      - name: Wemake Python Styleguide
+        uses: wemake-services/wemake-python-styleguide@0.19.2
+        continue-on-error: true # Permite que o workflow continue mesmo se houver avisos de estilo
+        with:
+          reporter: "github-pr-review"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -7,15 +7,19 @@ ENV PYTHONUNBUFFERED 1
 
 # Fiz os hosts permitidos para o Django não dar erro de 'NoneType'
 ENV DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1 [::1]"
-# -------------------
 
 # Define o diretório de trabalho
 WORKDIR /app
 
-# INSTALAÇÃO DO GIT
+# --- MUDANÇA AQUI: INSTALAÇÃO DO GIT E DEPENDÊNCIAS DE BUILD ---
+# Adicionamos gcc, libpq-dev e python3-dev para o psycopg2 conseguir compilar
 RUN apt-get update && apt-get install -y \
     git \
+    gcc \
+    libpq-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
+# --------------------------------------------------------------
 
 # Copia e instala dependências do Python
 COPY requirements.txt /app/
@@ -27,5 +31,5 @@ COPY . /app/
 # Expõe a porta que o Django utiliza
 EXPOSE 8000
 
-#  Tenta rodar as migrações e depois inicia o servidor
+# Tenta rodar as migrações e depois inicia o servidor
 CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
