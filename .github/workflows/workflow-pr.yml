@@ -49,7 +49,8 @@ jobs:
           SQL_DATABASE: bookstore_db
           SQL_USER: bookstore_user
           SQL_PASSWORD: bookstore_password
-          SQL_HOST: localhost
+          SQL_HOST: 127.0.0.1
           SQL_PORT: 5432
+          PGPASSWORD: bookstore_password # Adicione esta linha extra
         run: |
           poetry run python manage.py test
