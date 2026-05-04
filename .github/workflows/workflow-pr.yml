@@ -1,6 +1,5 @@
 name: Python Pull Request Workflow
 
-# Este workflow só roda quando um Pull Request é aberto ou atualizado
 on:
   pull_request:
     branches: [main, master]
@@ -10,38 +9,55 @@ jobs:
     name: Quality check
     runs-on: ubuntu-latest
 
+    # Adicionamos um banco de dados temporário para os testes
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: bookstore_db
+          POSTGRES_USER: bookstore_user
+          POSTGRES_PASSWORD: bookstore_password
+        ports:
+          - 5432:5432
+        # Garante que o Postgres esteja pronto antes de começar
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      # 1. Baixa o código do Pull Request
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Configura o Python (usando a versão 3.13 do seu projeto)
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
-      # 3. Instala o Poetry
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # 4. Instala as dependências
       - name: Install dependencies
         run: |
           poetry install
 
-      # 5. Executa os testes automatizados
+      # Agora passamos as informações do banco para o Django rodar o teste
       - name: Run Tests
+        env:
+          DB_NAME: bookstore_db
+          DB_USER: bookstore_user
+          DB_PASSWORD: bookstore_password
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: |
           poetry run python manage.py test
 
-      # 6. Verificação de Estilo (Lint/Styleguide)
-      # Isso garante que seu código está "limpo" e segue os padrões profissionais
       - name: Wemake Python Styleguide
         uses: wemake-services/wemake-python-styleguide@0.19.2
-        continue-on-error: true # Permite que o workflow continue mesmo se houver avisos de estilo
+        continue-on-error: true
         with:
           reporter: "github-pr-review"
         env:
