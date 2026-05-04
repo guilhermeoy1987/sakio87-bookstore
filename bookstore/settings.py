@@ -165,3 +165,5 @@ if env_allowed_hosts:
 else:
     # Fallback para permitir acesso local e Docker
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "[::1]"]
+
+    # Triggering GitHub Actions with fixed tests
