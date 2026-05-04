@@ -13,10 +13,10 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: bookstore_db
-          POSTGRES_USER: bookstore_user
+          # Criamos o usuário 'postgres' explicitamente para o Django não reclamar
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: bookstore_password
-          # Esta linha permite que o Django crie o banco de teste sem ser barrado
+          POSTGRES_DB: bookstore_db
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
@@ -46,16 +46,14 @@ jobs:
 
       - name: Run Tests
         env:
-          # Variáveis para o seu settings.py
+          # O segredo: aqui dizemos ao Django para usar o usuário 'postgres' que agora existe
           SQL_ENGINE: django.db.backends.postgresql
           SQL_DATABASE: bookstore_db
-          SQL_USER: bookstore_user
+          SQL_USER: postgres
           SQL_PASSWORD: bookstore_password
           SQL_HOST: 127.0.0.1
           SQL_PORT: 5432
-          # Variáveis que forçam o driver do Postgres a usar as credenciais corretas
-          PGUSER: bookstore_user
+          PGUSER: postgres
           PGPASSWORD: bookstore_password
-          USER: bookstore_user
         run: |
           poetry run python manage.py test
