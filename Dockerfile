@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Fiz os hosts permitidos para o Django não dar erro de 'NoneType'
-ENV DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1 [::1]"
+# Adicionamos .onrender.com aqui também como garantia de ambiente
+ENV DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1 [::1] .onrender.com"
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -28,8 +29,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia o restante do projeto
 COPY . /app/
 
-# Expõe a porta que o Django utiliza
+# O Render vai gerenciar a porta automaticamente, mas deixamos exposta a variável de ambiente
 EXPOSE 8000
 
-# Tenta rodar as migrações e depois inicia o servidor
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# ⚡ AJUSTE AQUI: Roda as migrações e inicia com Gunicorn usando a porta dinâmica do Render
+CMD ["sh", "-c", "python manage.py migrate && gunicorn bookstore.wsgi:application --bind 0.0.0.0:$PORT"]
